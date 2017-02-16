@@ -23,10 +23,7 @@ from google.appengine.ext import db
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape=True)
 
-class MainHandler(webapp2.RequestHandler):
-    def render_front(self, title='', art='', error=''):
-        self.render('front.html', title=title, art=art, error=error)
-
+class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
 
@@ -36,6 +33,15 @@ class MainHandler(webapp2.RequestHandler):
 
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
+
+class Art(db.model):
+    title = db.StringProperty(required = True)
+    art = db.TextProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+
+class MainHandler(Handler):
+    def render_front(self, title='', art='', error=''):
+        self.render('front.html', title=title, art=art, error=error)
 
     def get(self):
         self.render('front.html')
@@ -48,7 +54,7 @@ class MainHandler(webapp2.RequestHandler):
             self.write('thanks!')
         else:
             error = "we need both a title and some artwork!"
-            
+            self.render_front(title, art, error)
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
 ], debug=True)
