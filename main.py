@@ -34,30 +34,39 @@ class Handler(webapp2.RequestHandler):
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
 
-class Art(db.Model):
+class Post(db.Model):
     title = db.StringProperty(required = True)
-    art = db.TextProperty(required=True)
+    post = db.TextProperty(required=True)
     created = db.DateTimeProperty(auto_now_add=True)
 
 class MainHandler(Handler):
-    def render_front(self, title='', art='', error=''):
-        arts=db.GqlQuery('SELECT * FROM Art ORDER By created DESC')
-        self.render('front.html', title=title, art=art, error=error, arts=arts)
+    def render_front(self, title='', post='', error=''):
+        posts=db.GqlQuery('SELECT * FROM Post ORDER By created DESC LIMIT 5')
+        self.render('front.html', title=title, post=post, error=error, posts=posts)
 
     def get(self):
-        self.render('front.html')
+        self.render_front('front.html')
+
+class Newpost(Handler):
+    def render_newpost(self, title='', post='', error=''):
+        self.render('newpost.html', title=title, post=post, error=error)
+
+    def get(self):
+        self.render_newpost()
 
     def post(self):
         title = self.request.get('title')
-        art = self.request.get('art')
+        post = self.request.get('post')
 
-        if title and art:
-            a = Art(title=title, art=art)
-            a.put()
+
+        if title and post:
+            p = Post(title=title, post=post)
+            p.put()
             self.redirect('/')
         else:
-            error = "we need both a title and some artwork!"
-            self.render_front(title, art, error)
+            error = "we need both a title and a post!"
+            self.render_front(title, post, error)
+
 app = webapp2.WSGIApplication([
-    ('/', MainHandler),
+    ('/', MainHandler), ('/newpost', Newpost)
 ], debug=True)

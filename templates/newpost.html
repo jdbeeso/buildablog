@@ -1,0 +1,21 @@
+
+
+<!DOCTYPE html>
+<html>
+<body>
+<h1>build-a-blog</h1>
+{% block content %}
+<form method='post'>
+    <label>
+      <div>title</div>
+      <input type="text" name='title' value="{{title}}">
+    </label>
+    <label>
+      <div>post</div>
+      <textarea name='post' value="{{post}}"></textarea>
+    </label>
+    <div class='error'>{{error}}</div>
+    <input type='submit'>
+</form>
+{% endblock %}
+<hr>
