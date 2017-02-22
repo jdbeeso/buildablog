@@ -62,14 +62,16 @@ class Newpost(Handler):
         if title and post:
             p = Post(title=title, post=post)
             p.put()
-            self.redirect('/')
+            post.key().id()
+            self.redirect("/blog/'key'")
         else:
             error = "we need both a title and a post!"
             self.render_front(title, post, error)
 
 class ViewPostHandler(webapp2.RequestHandler):
     def get(self, id):
-        self.response.out.write("42")
+        Post.get_by_id((int(id)))
+        self.response.out.write(id)
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler), ('/newpost', Newpost), webapp2.Route('/blog/<id:\d+>', ViewPostHandler)

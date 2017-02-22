@@ -55,7 +55,7 @@
 	<h1>Build-A-Blog</h1>
 	{% for post in posts %}
 		<div class='post'>
-			<div class='post-title'>{{post.title}}</div>
+			<a href=/blog/{{post.key().id()}}><div class='post-title'>{{post.title}}</div></a>
 			<pre class='post-body'>{{post.post}}
 		</div>
 	{% endfor %}
