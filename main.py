@@ -42,10 +42,10 @@ class Post(db.Model):
 class MainHandler(Handler):
     def render_front(self, title='', post='', error=''):
         posts=db.GqlQuery('SELECT * FROM Post ORDER By created DESC LIMIT 5')
-        self.render('front.html', title=title, post=post, error=error, posts=posts)
+        self.render('front.html',title=title, post=post, error=error, posts=posts)
 
     def get(self):
-        self.render_front('front.html')
+        self.render_front()
 
 class Newpost(Handler):
     def render_newpost(self, title='', post='', error=''):
@@ -58,20 +58,24 @@ class Newpost(Handler):
         title = self.request.get('title')
         post = self.request.get('post')
 
-
         if title and post:
             p = Post(title=title, post=post)
             p.put()
-            post.key().id()
-            self.redirect("/blog/'key'")
+            post_id = p.key().id()
+            p.get_by_id(post_id)
+            self.redirect('/blog/%s' % str(post_id))
         else:
             error = "we need both a title and a post!"
             self.render_front(title, post, error)
 
-class ViewPostHandler(webapp2.RequestHandler):
+class ViewPostHandler(Handler):
+    def render_blog_post(self, template, post):
+        self.render('blog_post.html', post=post)
+
     def get(self, id):
-        Post.get_by_id((int(id)))
-        self.response.out.write(id)
+        post = Post.get_by_id(int(id))
+        self.render_blog_post('blog_post.html', post)
+
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler), ('/newpost', Newpost), webapp2.Route('/blog/<id:\d+>', ViewPostHandler)
